@@ -3,6 +3,7 @@
 #include "Walnut/Timer.h"
 #include "Renderer.h"
 #include "Camera.h"
+#include <glm/gtc/type_ptr.hpp>
 
 using namespace Walnut;
 class ExampleLayer : public Walnut::Layer
@@ -11,7 +12,20 @@ public:
     ExampleLayer()
         : m_Camera(45.0f, 0.1f, 100.0f)
     {
-
+        {
+            Sphere sphere;
+            sphere.radius = 0.2;
+            sphere.Position = { 0.0f, 0.0f, 0.0f };
+            sphere.Albedo = { 1.0f, 0.0f, 1.0f };
+            m_Scene.Spheres.push_back(sphere);
+        }
+        {
+            Sphere sphere;
+            sphere.radius = 0.5;
+            sphere.Position = { 1.0f, 0.0f, -5.0f };
+            sphere.Albedo = { 0.0f, 1.0f, 1.0f };
+            m_Scene.Spheres.push_back(sphere);
+        }
     }
 
     virtual void OnUpdate(float ts) override
@@ -27,6 +41,21 @@ public:
         {
             Render();
         }
+        ImGui::End();
+
+        ImGui::Begin("Scene");
+        auto pos = m_Camera.GetPosition();
+        ImGui::Text("Camera Pos: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z);
+        for (size_t i = 0; i < m_Scene.Spheres.size(); i++)
+        {
+            ImGui::PushID(i);
+            ImGui::DragFloat3("Position", glm::value_ptr(m_Scene.Spheres[i].Position), 0.1f);
+            ImGui::DragFloat("Radius", &m_Scene.Spheres[i].radius, 0.1f);
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(m_Scene.Spheres[i].Albedo), 0.1f);
+            ImGui::PopID();
+            ImGui::Separator();
+        }
+
         ImGui::End();
 
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
@@ -51,7 +80,7 @@ public:
 
         m_Renderer.OnResize(m_ViewPortWidth, m_ViewPortHeight);
         m_Camera.OnResize(m_ViewPortWidth, m_ViewPortHeight);
-        m_Renderer.Render(m_Camera);
+        m_Renderer.Render(m_Scene, m_Camera);
 
         m_LastRenderTime = timer.ElapsedMillis();
     }
@@ -59,6 +88,7 @@ public:
 private:
     Renderer m_Renderer;
     Camera m_Camera;
+    Scene m_Scene;
     uint32_t m_ViewPortWidth = 0, m_ViewPortHeight = 0;
 
     float m_LastRenderTime = 0.0f;
