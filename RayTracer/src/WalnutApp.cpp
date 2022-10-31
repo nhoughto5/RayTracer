@@ -14,17 +14,32 @@ public:
     {
         {
             Sphere sphere;
-            sphere.radius = 0.2;
+            sphere.radius = 1.0f;
             sphere.Position = { 0.0f, 0.0f, 0.0f };
-            sphere.Albedo = { 1.0f, 0.0f, 1.0f };
+            sphere.MaterialIndex = 0;
             m_Scene.Spheres.push_back(sphere);
         }
         {
             Sphere sphere;
-            sphere.radius = 0.5;
-            sphere.Position = { 1.0f, 0.0f, -5.0f };
-            sphere.Albedo = { 0.0f, 1.0f, 1.0f };
+            sphere.radius = 100.0f;
+            sphere.Position = { 0.0f, -101.0f, 0.0f };
+            sphere.MaterialIndex = 1;
             m_Scene.Spheres.push_back(sphere);
+        }
+
+        {
+            Material material;
+            material.Albedo = { 1.0f, 0.0f, 1.0f };
+            material.Roughness = 0.05;
+            material.Metallic = 1.0;
+            m_Scene.Materials.push_back(material);
+        }
+        {
+            Material material;
+            material.Albedo = { 0.2f, 0.30f, 1.0f };
+            material.Roughness = 0.05;
+            material.Metallic = 1.0;
+            m_Scene.Materials.push_back(material);
         }
     }
 
@@ -51,7 +66,17 @@ public:
             ImGui::PushID(i);
             ImGui::DragFloat3("Position", glm::value_ptr(m_Scene.Spheres[i].Position), 0.1f);
             ImGui::DragFloat("Radius", &m_Scene.Spheres[i].radius, 0.1f);
-            ImGui::ColorEdit3("Albedo", glm::value_ptr(m_Scene.Spheres[i].Albedo), 0.1f);
+            ImGui::DragInt("Material", &m_Scene.Spheres[i].MaterialIndex, 1.0f, 0, (int)m_Scene.Materials.size()-1);
+            ImGui::PopID();
+            ImGui::Separator();
+        }
+
+        for (size_t i = 0; i < m_Scene.Materials.size(); i++)
+        {
+            ImGui::PushID(i);
+            ImGui::ColorEdit3("Albedo", glm::value_ptr(m_Scene.Materials[i].Albedo), 0.1f);
+            ImGui::DragFloat("Roughness", &m_Scene.Materials[i].Roughness, 0.05f, 0.0f, 1.0f);
+            ImGui::DragFloat("Metallic", &m_Scene.Materials[i].Metallic, 0.05f, 0.0f, 1.0f);
             ImGui::PopID();
             ImGui::Separator();
         }
